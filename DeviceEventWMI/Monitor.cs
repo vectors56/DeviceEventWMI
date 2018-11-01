@@ -6,7 +6,7 @@ using System.Management;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DeviceEventWMI
+namespace DeviceEventConsole
 {
     class Monitor
     {

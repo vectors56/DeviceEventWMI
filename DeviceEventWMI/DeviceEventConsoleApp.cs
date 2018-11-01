@@ -8,9 +8,9 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using System.IO;
 
-namespace DeviceEventWMI
+namespace DeviceEventConsole
 {
-    class Program
+    class DeviceEventConsoleApp
     {
         static void Main(string[] args)
         {
@@ -25,16 +25,8 @@ namespace DeviceEventWMI
 
             if (options.watch != null)
             {
-                string spec;
-                using (StreamReader reader = new StreamReader(options.watch))
-                {
-                    spec = reader.ReadToEnd();
-                }
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.MissingMemberHandling = MissingMemberHandling.Error;
-                MonitorDescr descr = JsonConvert.DeserializeObject<MonitorDescr>(spec, settings);
-                Monitor monitor = new Monitor(descr, options.verbose);
-                WatchDevice(monitor);
+                MonitorTask task = new MonitorTask(options.watch, options.verbose);
+                task.Run();
             }
 
             if (!options.list && options.watch == null)
@@ -50,15 +42,5 @@ namespace DeviceEventWMI
             }
         }
 
-        static void WatchDevice(Monitor monitor)
-        {
-            ManagementEventWatcher watcher = new ManagementEventWatcher("Select * From Win32_DeviceChangeEvent Within 1 Where EventType = 2 Or EventType = 3");
-            while(true)
-            {
-                ManagementBaseObject e = watcher.WaitForNextEvent();
-                monitor.Update();
-            }
-        }
     }
-    
 }
